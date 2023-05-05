@@ -36,7 +36,6 @@
     let write_data = JSON.stringify(data);
 		await invoke('write_data', {data: write_data});
 	}
-
 </script>
 <main>
 	<Aside listFiles={data} bind:selectFile={i_file} />
@@ -88,20 +87,20 @@
 				/>
 			</div>
 		{/if}
-
-
 	</div>
 </main>
 
 <style>
-	main {display: flex;height: 100%; }
-	.container {
-			flex: 1;
-      padding: 1em;
-		    font-size: 1.3em;
-		margin-left: 200px;
+	main {
+		display: flex;
+		height: 100%;
+		color: #eee;
+		flex: 1;
+		flex-direction: column;
+		width: 100%;
+		margin: 0 auto;
+		box-sizing: border-box;
 	}
-	.code {
-		border: 1px solid #363746;
-	}
+	.container {flex: 1;padding: 1em;font-size: 1.3em;margin-left: 200px;}
+	.code {border: 1px solid #363746;}
 </style>

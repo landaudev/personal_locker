@@ -186,6 +186,9 @@ fn read_file_data(file_path: &str) -> String {
     return serde_json::to_string(&decrypted_data).unwrap();
 }
 
+// This function creates a new file at the specified path with no data, if the file doesn't already exist.
+// If the file already exists, it returns a message indicating that the file data already exists.
+// If the file cannot be created, it returns a message indicating that the file data was not created.
 fn create_file_data(file_path: &str) -> String {
     let path = Path::new(file_path);
     if !path.exists() {
@@ -216,9 +219,11 @@ fn chek_password(password: &str) -> String {
 
 #[tauri::command]
 fn get_pass() -> String {
+    // First, we check if the file with the password exists. If it doesn't, we print an error message and return a default string.
     if let Err(e) = create_file_chek_pass("ps.json") {
         println!("Error: {}", e);
         return "Password does not exist.".to_string();
+    // If the file exists, we return a message indicating that the password is available.
     } else {
         return "Password exists.".to_string();
     }
@@ -260,26 +265,39 @@ fn create_file_chek_pass(file_path: &str) -> Result<(), Error> {
 
 #[tauri::command]
 fn create_password(password: &str) -> String {
+    // Hash the input password using a hash function.
     let pass = password_to_hash(password);
 
+    // Define a new file path for the output file.
     let path = Path::new("ps.json");
+
+    // Open the output file in write-only mode.
     let mut file = match File::create(&path) {
-        Err(why) => panic!("couldn't create {}", why),
-        Ok(file) => file,
+        Err(why) => panic!("couldn't create {}", why), // Handle any errors that occur while creating the file.
+        Ok(file) => file, // Return the opened file handle if successful.
     };
+
+    // Create a JSON object with the hashed password.
     let json = json!({"password_login": pass});
+
+    // Write the JSON object to the output file.
     match file.write_all(json.to_string().as_bytes()) {
-        Err(why) => panic!("couldn't write to {}: {}", path.display(), why),
-        Ok(_) => println!("successfully wrote to {}", path.display()),
+        Err(why) => panic!("couldn't write to {}: {}", path.display(), why), // Handle any errors that occur while writing to the file.
+        Ok(_) => println!("successfully wrote to {}", path.display()), // Print a success message if the write operation is successful.
     }
-    "Password exists.".to_string()
+    "Password exists.".to_string() // Return a success message indicating that the password has been created.
 }
 
 fn password_to_hash(pass: &str) -> String {
+    // Create a new SHA-256 hasher instance.
     let mut hasher = Sha256::new();
+    // Update the hasher with the password bytes.
     hasher.update(pass);
+    // Finalize the hashing process and retrieve the raw hash bytes.
     let hash_result = hasher.finalize();
+    // Convert the raw hash bytes to a hexadecimal string representation.
     let hash_string = format!("{:x}", hash_result);
+    // Return the resulting hash string.
     hash_string
 }
 

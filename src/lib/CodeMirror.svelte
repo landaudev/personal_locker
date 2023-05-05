@@ -17,19 +17,9 @@ onMount(() => {
 })
 
 export let view = null
-
-/* `doc` is deliberately made non-reactive for not storing a reduntant string
-   besides the editor. Also, setting doc to undefined will not trigger an
-   update, so that you can clear it after setting one. */
 export let doc
-
-/* Set this if you would like to listen to all transactions via `update` event. */
 export let verbose = false
-
-/* Cached doc string so that we don't extract strings in bulk over and over. */
 let _docCached = null
-
-/* Overwrite the bulk of the text with the one specified. */
 function _setText(text) {
   view.dispatch({
     changes: {from: 0, to: view.state.doc.length, insert: text},
@@ -37,8 +27,6 @@ function _setText(text) {
 }
 
 const subscribers = new Set()
-
-/* And here comes the reactivity, implemented as a r/w store. */
 export const docStore = {
   ready: () => (view !== null),
   subscribe(cb) {
@@ -98,8 +86,6 @@ function dispatchDocStore(s) {
   }
 }
 
-// the view will be inited with the either doc (as long as that it is not `undefined`)
-// or the value in docStore once set
 function _initEditorView(initialDoc) {
   if (view !== null) {
     return false
@@ -115,7 +101,6 @@ function _initEditorView(initialDoc) {
 }
 
 $: if (_mounted && doc !== undefined) {
-  const inited = _initEditorView(doc)
   dispatchDocStore(doc)
 }
 
@@ -126,14 +111,5 @@ onDestroy(() => {
 })
 </script>
 
-
-  <div class="codemirror" bind:this={dom}>
-  </div>
-
-
-<style>
-.codemirror {
-  display: contents;
-}
-
-</style>
+<div class="codemirror" bind:this={dom}>
+</div>
